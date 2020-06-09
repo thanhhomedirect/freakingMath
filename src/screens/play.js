@@ -25,6 +25,8 @@ const Play = ({navigation}) => {
   const [progress, setProgress] = useState(1);
   const [operator, setOperator] = useState('');
   const [isTrue, setIsTrue] = useState(true);
+  const [level, setLevel] = useState(1);
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -33,40 +35,73 @@ const Play = ({navigation}) => {
     return () => clearInterval(interval);
   }, [progress]);
   useEffect(() => {
-    generate();
+    generateCalculation();
+  }, [generateCalculation]);
+
+  function getRandomNumber(min, max) {
+    return Math.floor(Math.random() * (max - min) + min);
+  }
+
+  function getRandomOperator() {
+    let operators = ['+', '-', '*'];
+    let ran = Math.floor(Math.random() * operators.length);
+    return operators[ran];
+  }
+
+  const generateCalculation = useCallback(() => {
+    let number1 = getRandomNumber(1 * level, 5 * level);
+    let number2 = getRandomNumber(1 * level, 5 * level);
+    let op = getRandomOperator();
+    setScore(score + 1);
+    setOperator(
+      `${number1}+${number2}=${getRandomResult(number1, number2, op)}`,
+    );
+  }, [getRandomResult, level, score]);
+
+  const getRandomResult = useCallback(
+    (number1, number2, op) => {
+      let randomResult = Math.random() >= 0.5; //tỉ lệ đúng sai 50:50
+      setIsTrue(randomResult);
+      return randomResult
+        ? getResult(number1, number2, op)
+        : getFakeResult(number1, number2, op);
+    },
+    [getFakeResult],
+  );
+
+  function getResult(number1, number2, op) {
+    const c = number1 + number2;
+    return c;
+  }
+
+  const getFakeResult = useCallback((number1, number2, op) => {
+    let fakeResult = getRandomNumber(
+      getResult(number1, number2, op) - 10,
+      getResult(number1, number2, op) + 10,
+    );
+    return fakeResult === getResult(number1, number2, op)
+      ? getFakeResult(number1, number2, op)
+      : fakeResult;
   }, []);
 
-  const generate = () => {
-    const localIstrue = Math.round(Math.random()) >= 0.5;
-    const a = Math.round(Math.random()) + 1;
-    const b = Math.round(Math.random()) + 2;
-    let c = a + b;
-    setIsTrue(localIstrue);
-    if (!localIstrue) {
-      alert(localIstrue)
-      c =
-        c +
-        a * (Math.round(Math.random()) + 1) -
-        b * (Math.round(Math.random()) + 1);
-    }
-    setOperator(`${a}+${b}=${c}`);
-  };
   const onPressLeftButton = useCallback(() => {
     if (isTrue) {
-      generate();
+      generateCalculation();
       setProgress(1.11);
       return;
     }
-    navigation.navigate('Home');
-  }, [isTrue, navigation]);
+    // navigation.navigate('Home');
+    alert('Gà vl');
+  }, [isTrue, generateCalculation]);
   const onPressRightButton = useCallback(() => {
     if (!isTrue) {
-      generate();
+      generateCalculation();
       setProgress(1.11);
       return;
     }
-    navigation.navigate('Home');
-  }, [isTrue, navigation]);
+    // navigation.navigate('Home');
+    alert('Gà vl');
+  }, [isTrue, generateCalculation]);
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -82,10 +117,10 @@ const Play = ({navigation}) => {
           <View style={styles.body}>
             <View style={styles.header}>
               <View style={styles.leftHeader}>
-                <Text>Best: </Text>
+                <Text style={styles.headerText}>Best: </Text>
               </View>
               <View style={styles.rightHeader}>
-                <Text>Score: </Text>
+                <Text style={styles.headerText}>Score: {score}</Text>
               </View>
             </View>
           </View>
@@ -216,12 +251,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
     alignItems: 'center',
-    fontSize: 50,
   },
   leftHeader: {
     fontSize: 150,
+  },
+  headerText: {
+    fontSize: 20,
+    color: Colors.lighter,
   },
 });
 
