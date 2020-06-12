@@ -23,7 +23,7 @@ const Home = ({navigation}) => {
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      <SafeAreaView style={{flex: 1, backgroundColor: 'gray'}}>
+      <SafeAreaView style={{flex: 1, backgroundColor: '#feb300'}}>
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           style={styles.scrollView}>
@@ -73,7 +73,7 @@ const Home = ({navigation}) => {
 
 const styles = StyleSheet.create({
   scrollView: {
-    backgroundColor: 'gray',
+    // backgroundColor: 'gray',
   },
   engine: {
     position: 'absolute',
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   body: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'gray',
+    // backgroundColor: 'gray',
   },
   sectionContainer: {
     marginTop: 64,

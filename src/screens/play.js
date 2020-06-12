@@ -1,11 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
 import React, {useState, useEffect, useCallback} from 'react';
 import {
   SafeAreaView,
@@ -14,12 +6,15 @@ import {
   Text,
   StatusBar,
   Dimensions,
+  Modal,
 } from 'react-native';
 import {Icon} from 'react-native-elements';
 import * as Progress from 'react-native-progress';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const {width} = Dimensions.get('window');
+const backgroundColors = ['green', 'gray', 'purple'];
 
 const Play = ({navigation}) => {
   const [progress, setProgress] = useState(1);
@@ -27,16 +22,63 @@ const Play = ({navigation}) => {
   const [isTrue, setIsTrue] = useState(true);
   const [level, setLevel] = useState(1);
   const [score, setScore] = useState(0);
+  const [highScore, setHighScore] = useState(0);
+  const [isNewBest, setIsNewBest] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [colorRandom, setColorRandom] = useState('gray');
 
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress(progress - 0.01);
     }, 20);
+    if (progress <= 0) {
+      clearInterval(interval);
+      failToWin();
+    }
     return () => clearInterval(interval);
-  }, [progress]);
+  }, [progress, score, setValueInStore]);
+
   useEffect(() => {
+    getRandomColor();
+  }, [score]);
+
+  useEffect(() => {
+    async function setState() {
+      const data = await getStoreData();
+      setHighScore(data);
+    }
+    setState();
     generateCalculation();
-  }, [generateCalculation]);
+  }, [generateCalculation, storeData]);
+
+  const setValueInStore = useCallback(
+    async value => {
+      const data = await getStoreData();
+      if (value <= data) return;
+      setIsNewBest(true);
+      setHighScore(score);
+      storeData(score);
+    },
+    [score, storeData],
+  );
+
+  const storeData = useCallback(async value => {
+    try {
+      await AsyncStorage.setItem('@high_score', value + '');
+    } catch (e) {
+      // saving error
+    }
+  }, []);
+  const getStoreData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('@high_score');
+      if (value !== null) {
+        return value;
+      } else return 0;
+    } catch (e) {
+      // error reading value
+    }
+  };
 
   function getRandomNumber(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
@@ -52,15 +94,18 @@ const Play = ({navigation}) => {
     let number1 = getRandomNumber(1 * level, 5 * level);
     let number2 = getRandomNumber(1 * level, 5 * level);
     let op = getRandomOperator();
-    setScore(score + 1);
     setOperator(
-      `${number1}+${number2}=${getRandomResult(number1, number2, op)}`,
+      `${number1}${op === '*' ? 'x' : op}${number2}=${getRandomResult(
+        number1,
+        number2,
+        op,
+      )}`,
     );
-  }, [getRandomResult, level, score]);
+  }, [getRandomResult, level]);
 
   const getRandomResult = useCallback(
     (number1, number2, op) => {
-      let randomResult = Math.random() >= 0.5; //tỉ lệ đúng sai 50:50
+      let randomResult = Math.random() >= 0.5;
       setIsTrue(randomResult);
       return randomResult
         ? getResult(number1, number2, op)
@@ -70,8 +115,21 @@ const Play = ({navigation}) => {
   );
 
   function getResult(number1, number2, op) {
-    const c = number1 + number2;
-    return c;
+    let result;
+    switch (op) {
+      case '+':
+        result = number1 + number2;
+        break;
+      case '-':
+        result = number1 - number2;
+        break;
+      case '*':
+        result = number1 * number2;
+        break;
+      default:
+        alert('NOT FOUND');
+    }
+    return result;
   }
 
   const getFakeResult = useCallback((number1, number2, op) => {
@@ -84,77 +142,156 @@ const Play = ({navigation}) => {
       : fakeResult;
   }, []);
 
-  const onPressLeftButton = useCallback(() => {
+  const onPressLeftButton = () => {
     if (isTrue) {
-      generateCalculation();
-      setProgress(1.11);
+      answerTrue();
       return;
     }
-    // navigation.navigate('Home');
-    alert('Gà vl');
-  }, [isTrue, generateCalculation]);
-  const onPressRightButton = useCallback(() => {
+    failToWin();
+  };
+
+  const onPressRightButton = () => {
     if (!isTrue) {
-      generateCalculation();
-      setProgress(1.11);
+      answerTrue();
       return;
     }
-    // navigation.navigate('Home');
-    alert('Gà vl');
-  }, [isTrue, generateCalculation]);
+    failToWin();
+  };
+
+  const failToWin = () => {
+    setIsGameOver(true);
+    setValueInStore(score);
+    setLevel(1);
+    setTimeout(() => {
+      generateCalculation();
+    }, 300);
+  };
+
+  const answerTrue = () => {
+    const scoreTemp = score + 1;
+    generateCalculation();
+    setProgress(1.11);
+    setScore(scoreTemp);
+    checkBeforeUpdateLevel(scoreTemp);
+  };
+  const onPressClosedModal = () => {
+    setIsGameOver(!isGameOver);
+    navigation.navigate('Home');
+  };
+  const onPressPlayAgain = () => {
+    setIsGameOver(!isGameOver);
+    setScore(0);
+    setProgress(1);
+    setIsNewBest(false);
+  };
+  const checkBeforeUpdateLevel = scoreParam => {
+    const checkLevel = scoreParam % 10;
+    const levelTemp = Math.floor(scoreParam / 10);
+    if (checkLevel !== 0 || levelTemp === 0) return;
+    setLevel(levelTemp + 1);
+  };
+  const getRandomColor = () => {
+    var item =
+      backgroundColors[Math.floor(Math.random() * backgroundColors.length)];
+    setColorRandom(item);
+  };
+
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      <SafeAreaView style={{flex: 1, backgroundColor: 'gray'}}>
-        <Progress.Bar
-          progress={progress}
-          width={width}
-          color={'#f1f5f8'}
-          height={16}
-          style={{marginTop: 50}}
-        />
-        <View style={styles.comtainer}>
-          <View style={styles.body}>
-            <View style={styles.header}>
-              <View style={styles.leftHeader}>
-                <Text style={styles.headerText}>Best: </Text>
+      <SafeAreaView style={{flex: 1, backgroundColor: colorRandom}}>
+        {!isGameOver && (
+          <Progress.Bar
+            progress={progress}
+            width={width}
+            color={'#f1f5f8'}
+            height={16}
+            style={{marginTop: 50}}
+          />
+        )}
+        {!isGameOver && (
+          <View style={styles.comtainer}>
+            <View style={styles.body}>
+              <View style={styles.header}>
+                <View style={styles.leftHeader}>
+                  <Text style={styles.headerText}>Best: {highScore}</Text>
+                </View>
+                <View style={styles.leftHeader}>
+                  <Text style={styles.headerText}>Level: {level}</Text>
+                </View>
+                <View style={styles.leftHeader}>
+                  <Text style={styles.headerText}>Score: {score}</Text>
+                </View>
               </View>
-              <View style={styles.rightHeader}>
-                <Text style={styles.headerText}>Score: {score}</Text>
+            </View>
+            <View style={styles.body}>
+              <View style={styles.questionWrapper}>
+                <View style={styles.questionInner}>
+                  <Text style={styles.questionText}>{operator}</Text>
+                </View>
+              </View>
+            </View>
+            <View style={styles.body}>
+              <View style={styles.optionsButton}>
+                <View style={styles.trueButton}>
+                  <Icon
+                    name="check"
+                    type="material"
+                    size={130}
+                    color="green"
+                    onPress={onPressLeftButton}
+                  />
+                </View>
+                <View style={styles.falseButton}>
+                  <Icon
+                    name="clear"
+                    type="material"
+                    size={130}
+                    color="red"
+                    onPress={onPressRightButton}
+                  />
+                </View>
               </View>
             </View>
           </View>
-          <View style={styles.body}>
-            <View style={styles.questionWrapper}>
-              <View style={styles.questionInner}>
-                <Text style={styles.questionText}>{operator}</Text>
+        )}
+      </SafeAreaView>
+      <Modal animationType="slide" transparent={true} visible={isGameOver}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Game Over</Text>
+            <Text style={styles.modalTextScore}>{score}</Text>
+            {isNewBest && (
+              <View style={styles.modalTextNewBestWrapper}>
+                <Text style={styles.modalTextNewBestText}>New Best!</Text>
               </View>
-            </View>
-          </View>
-          <View style={styles.body}>
-            <View style={styles.optionsButton}>
-              <View style={styles.trueButton}>
+            )}
+            {!isNewBest && (
+              <View style={styles.modalTextNewBestWrapper}>
+                <Text style={styles.modalTextVeryGoodText}>Good!</Text>
+              </View>
+            )}
+            <View style={styles.groupBtn}>
+              <View style={styles.playButton}>
                 <Icon
-                  name="check"
+                  onPress={onPressPlayAgain}
+                  name="play-arrow"
                   type="material"
-                  size={130}
-                  color="green"
-                  onPress={onPressLeftButton}
+                  color="#517fa4"
                 />
               </View>
-              <View style={styles.falseButton}>
+              <View style={styles.playButton}>
                 <Icon
-                  name="clear"
+                  onPress={onPressClosedModal}
+                  name="home"
                   type="material"
-                  size={130}
-                  color="red"
-                  onPress={onPressRightButton}
+                  color="#517fa4"
                 />
               </View>
             </View>
           </View>
         </View>
-      </SafeAreaView>
+      </Modal>
     </>
   );
 };
@@ -172,7 +309,7 @@ const styles = StyleSheet.create({
   body: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'gray',
+    // backgroundColor: 'blue',
   },
   sectionContainer: {
     marginTop: 64,
@@ -211,6 +348,8 @@ const styles = StyleSheet.create({
   },
   playButton: {
     marginTop: 46,
+    marginLeft: 10,
+    marginRight: 10,
     backgroundColor: Colors.lighter,
     padding: 10,
     width: 100,
@@ -256,11 +395,71 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   leftHeader: {
-    fontSize: 150,
+    backgroundColor: Colors.lighter,
+    color: 'black',
+    padding: 5,
+    borderRadius: 5,
   },
   headerText: {
     fontSize: 20,
-    color: Colors.lighter,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'rgba(108, 122, 137, 1)',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    elevation: 5,
+  },
+  openButton: {
+    backgroundColor: '#F194FF',
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 50,
+    fontFamily: 'Cochin',
+    color: 'white',
+  },
+  modalTextScore: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 60,
+    color: 'white',
+  },
+  modalTextNewBestText: {
+    color: '#20232a',
+    fontSize: 30,
+  },
+  modalTextVeryGoodText: {
+    color: 'green',
+    fontSize: 30,
+  },
+  modalTextNewBestWrapper: {
+    marginBottom: 15,
+    textAlign: 'center',
+    borderWidth: 4,
+    borderColor: '#61dafb',
+    borderRadius: 6,
+    padding: 5,
+    backgroundColor: '#61dafb',
+  },
+  groupBtn: {
+    flexDirection: 'row',
   },
 });
 
