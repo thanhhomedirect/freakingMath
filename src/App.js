@@ -12,22 +12,13 @@ const Stack = createStackNavigator();
 function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          options={{
-            headerShown: false,
-          }}
-          name="Home"
-          component={Home}
-        />
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}>
+        <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Rate" component={Rate} />
-        <Stack.Screen
-          options={{
-            headerShown: false,
-          }}
-          name="Play"
-          component={Play}
-        />
+        <Stack.Screen name="Play" component={Play} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -13,47 +13,44 @@ import {
   ScrollView,
   View,
   Text,
-  StatusBar,
+  TouchableOpacity,
 } from 'react-native';
-import {Icon} from 'react-native-elements';
+import {Header} from 'components';
+import {Colors} from 'assets';
 
-import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
-
-const Rate: () => React$Node = () => {
+const Rate = ({navigation}) => {
+  const componentBtnLeftHeader = () => {
+    return (
+      <TouchableOpacity onPress={goBack} style={styles.boxLeft}>
+        <Text style={styles.textHeaderLeft}>Back</Text>
+      </TouchableOpacity>
+    );
+  };
+  const goBack = () => {
+    navigation.goBack();
+  };
+  const componentBtnRightHeader = () => {
+    return (
+      <TouchableOpacity onPress={null} style={styles.boxRight}>
+        <Text style={styles.textHeaderLeft}>Done</Text>
+      </TouchableOpacity>
+    );
+  };
   return (
     <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView style={{flex: 1, backgroundColor: 'gray'}}>
+      <SafeAreaView style={styles.container}>
+        <Header
+          titleHeader="Rate"
+          btnLeft
+          btnRight
+          componentBtnLeft={componentBtnLeftHeader}
+          componentBtnRight={componentBtnRightHeader}
+        />
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <View style={styles.body}>
-            <View style={styles.questionWrapper}>
-              <View style={styles.questionInner}>
-                <Text style={styles.questionText}>1+1=2</Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Freaking </Text>
-              <Text style={styles.sectionTitleBold}>Math</Text>
-            </View>
-          </View>
-          <View style={styles.body}>
-            <View style={styles.playButton}>
-              <Icon name="play-arrow" type="material" color="#517fa4" />
-            </View>
-          </View>
-          <View style={styles.body}>
-            <View style={styles.optionsButton}>
-              <View style={styles.rateButton}>
-                <Icon name="star-half" type="material" color="#e67315" />
-              </View>
-              <View style={styles.rankButton}>
-                <Icon name="team" type="antdesign" color="#e67315" />
-              </View>
-            </View>
+          style={styles.content}>
+          <View>
+            <Text>1+2</Text>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -62,83 +59,33 @@ const Rate: () => React$Node = () => {
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: 'gray',
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
   },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'gray',
-  },
-  sectionContainer: {
-    marginTop: 64,
-    paddingHorizontal: 36,
-    display: 'flex',
+  boxLeft: {
+    flex: 1,
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 2,
+    paddingLeft: 15,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.white,
+  boxRight: {
+    flex: 1,
+    alignItems: 'flex-end',
+    paddingRight: 15,
   },
-  sectionTitleBold: {
-    fontSize: 36,
-    fontWeight: '900',
-    color: Colors.white,
+  textHeaderLeft: {
+    fontSize: 15,
+    color: Colors.uglyBlue,
   },
-  questionWrapper: {
-    marginTop: 128,
-    paddingHorizontal: 24,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+  textHeaderRight: {
+    fontSize: 15,
+    color: Colors.tangerine,
   },
-  questionInner: {
-    backgroundColor: Colors.lighter,
-    padding: 10,
-    borderWidth: 2,
-    borderColor: Colors.lighter,
-    borderRadius: 5,
-  },
-  playButton: {
-    marginTop: 46,
-    backgroundColor: Colors.lighter,
-    padding: 10,
-    width: 100,
-    borderWidth: 2,
-    borderColor: Colors.lighter,
-    borderRadius: 5,
-  },
-  rateButton: {
-    backgroundColor: Colors.lighter,
-    padding: 10,
-    width: 100,
-    borderWidth: 2,
-    borderColor: Colors.lighter,
-    borderRadius: 5,
-    marginRight: 5,
-  },
-  rankButton: {
-    backgroundColor: Colors.lighter,
-    padding: 10,
-    width: 100,
-    borderWidth: 2,
-    borderColor: Colors.lighter,
-    borderRadius: 5,
-  },
-  optionsButton: {
+  content: {
+    paddingHorizontal: 15,
     marginTop: 10,
-    flexDirection: 'row',
-  },
-  questionText: {
-    fontSize: 56,
   },
 });
 

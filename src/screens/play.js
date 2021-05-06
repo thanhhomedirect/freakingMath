@@ -7,6 +7,7 @@ import {
   StatusBar,
   Dimensions,
   Modal,
+  TouchableNativeFeedback,
 } from 'react-native';
 import {Icon} from 'react-native-elements';
 import * as Progress from 'react-native-progress';
@@ -272,22 +273,16 @@ const Play = ({navigation}) => {
               </View>
             )}
             <View style={styles.groupBtn}>
-              <View style={styles.playButton}>
-                <Icon
-                  onPress={onPressPlayAgain}
-                  name="play-arrow"
-                  type="material"
-                  color="#517fa4"
-                />
-              </View>
-              <View style={styles.playButton}>
-                <Icon
-                  onPress={onPressClosedModal}
-                  name="home"
-                  type="material"
-                  color="#517fa4"
-                />
-              </View>
+              <TouchableNativeFeedback onPress={onPressPlayAgain}>
+                <View style={styles.playButton}>
+                  <Icon name="play-arrow" type="material" color="#517fa4" />
+                </View>
+              </TouchableNativeFeedback>
+              <TouchableNativeFeedback onPress={onPressClosedModal}>
+                <View style={styles.playButton}>
+                  <Icon name="home" type="material" color="#517fa4" />
+                </View>
+              </TouchableNativeFeedback>
             </View>
           </View>
         </View>

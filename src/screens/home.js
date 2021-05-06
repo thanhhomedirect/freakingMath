@@ -14,6 +14,7 @@ import {
   View,
   Text,
   StatusBar,
+  TouchableNativeFeedback,
 } from 'react-native';
 import {Icon} from 'react-native-elements';
 
@@ -41,28 +42,26 @@ const Home = ({navigation}) => {
             </View>
           </View>
           <View style={styles.body}>
-            <View style={styles.playButton}>
-              <Icon
-                onPress={() => navigation.navigate('Play')}
-                name="play-arrow"
-                type="material"
-                color="#517fa4"
-              />
-            </View>
+            <TouchableNativeFeedback
+              onPress={() => navigation.navigate('Play')}>
+              <View style={styles.playButton}>
+                <Icon name="play-arrow" type="material" color="#517fa4" />
+              </View>
+            </TouchableNativeFeedback>
           </View>
           <View style={styles.body}>
             <View style={styles.optionsButton}>
-              <View style={styles.rateButton}>
-                <Icon
-                  onPress={() => navigation.navigate('Rate')}
-                  name="star-half"
-                  type="material"
-                  color="#e67315"
-                />
-              </View>
-              <View style={styles.rankButton}>
-                <Icon name="team" type="antdesign" color="#e67315" />
-              </View>
+              <TouchableNativeFeedback
+                onPress={() => navigation.navigate('Rate')}>
+                <View style={styles.rateButton}>
+                  <Icon name="star-half" type="material" color="#e67315" />
+                </View>
+              </TouchableNativeFeedback>
+              <TouchableNativeFeedback>
+                <View style={styles.rankButton}>
+                  <Icon name="team" type="antdesign" color="#e67315" />
+                </View>
+              </TouchableNativeFeedback>
             </View>
           </View>
         </ScrollView>
