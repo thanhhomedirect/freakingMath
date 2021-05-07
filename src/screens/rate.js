@@ -6,7 +6,8 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
+import _, {map} from 'lodash';
 import {
   SafeAreaView,
   StyleSheet,
@@ -14,11 +15,52 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Keyboard,
 } from 'react-native';
 import {Header} from 'components';
 import {Colors} from 'assets';
+import {SearchBar} from 'react-native-elements';
+import api from 'api';
 
 const Rate = ({navigation}) => {
+  const inputRef = useRef(null);
+  const [keyword, setKeyword] = useState('');
+  const [definitions, setDefinitions] = useState([]);
+
+  const onChangeKeyword = text => {
+    setKeyword(text);
+  };
+  const onFocusSearch = () => {
+    console.log('focused');
+  };
+
+  const onBlurSearch = () => {
+    if (keyword === '') {
+      // setIsShowCancel(false);
+    }
+    Keyboard.dismiss();
+  };
+  const onClearSearch = () => {
+    setKeyword('');
+    inputRef?.current?.focus();
+  };
+
+  useEffect(() => {
+    if (keyword === '') return;
+    const timer = setTimeout(() => {
+      api.owlbot
+        .getTranslateWord(keyword)
+        .then(res => {
+          console.log('res', res);
+          setDefinitions(res.definitions);
+        })
+        .catch(e => {
+          console.log('e', e);
+        });
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [keyword]);
   const componentBtnLeftHeader = () => {
     return (
       <TouchableOpacity onPress={goBack} style={styles.boxLeft}>
@@ -46,12 +88,32 @@ const Rate = ({navigation}) => {
           componentBtnLeft={componentBtnLeftHeader}
           componentBtnRight={componentBtnRightHeader}
         />
+        <View style={styles.searchBarWrapper}>
+          <SearchBar
+            inputContainerStyle={[styles.backgroundColorWhite, styles.height40]}
+            inputStyle={[styles.backgroundColorWhite, styles.fontSize15]}
+            containerStyle={styles.searchContainer}
+            ref={inputRef}
+            onFocus={onFocusSearch}
+            onBlur={onBlurSearch}
+            onClear={onClearSearch}
+            placeholder="Type Here..."
+            onChangeText={onChangeKeyword}
+            searchIcon={{
+              type: 'font-awesome',
+              color: Colors.cloudyBlue,
+              name: 'search',
+              size: 16,
+            }}
+            value={keyword}
+          />
+        </View>
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           style={styles.content}>
-          <View>
-            <Text>1+2</Text>
-          </View>
+          {map([...definitions], (item, index) => {
+            return <Text>{`definitions: ${item.definition}`}</Text>;
+          })}
         </ScrollView>
       </SafeAreaView>
     </>
@@ -83,9 +145,33 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: Colors.tangerine,
   },
+  fontSize15: {
+    fontSize: 15,
+  },
   content: {
     paddingHorizontal: 15,
     marginTop: 10,
+  },
+  height40: {
+    height: 40,
+  },
+  backgroundColorWhite: {backgroundColor: 'white', color: Colors.darkGrey},
+  searchContainer: {
+    flex: 1,
+    backgroundColor: 'white',
+    borderWidth: 0.5,
+    marginVertical: 15,
+    paddingBottom: 1,
+    borderRadius: 4,
+    borderColor: Colors.cloudyBlue,
+    borderTopColor: Colors.cloudyBlue,
+    borderBottomColor: Colors.cloudyBlue,
+    padding: 0,
+  },
+  searchBarWrapper: {
+    marginHorizontal: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 

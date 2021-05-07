@@ -1,0 +1,14 @@
+{
+  "path-intellisense.mappings": {
+      "assets": "${workspaceRoot}/src/assets",
+      "app-redux": "${workspaceRoot}/src/app-redux",
+      "utils": "${workspaceRoot}/src/utils",
+      "api": "${workspaceRoot}/src/api",
+      "components": "${workspaceRoot}/src/components",
+    },
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "javascript.format.insertSpaceAfterConstructor": true,
+  "eslint.packageManager": "yarn",
+}
+  
