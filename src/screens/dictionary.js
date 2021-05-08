@@ -1,11 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
 import React, {useState, useEffect, useCallback, useRef} from 'react';
 import _, {map} from 'lodash';
 import {
@@ -17,15 +9,16 @@ import {
   TouchableOpacity,
   Keyboard,
 } from 'react-native';
-import {Header} from 'components';
+import {Header, CardItem} from 'components';
 import {Colors} from 'assets';
 import {SearchBar} from 'react-native-elements';
 import api from 'api';
 
-const Rate = ({navigation}) => {
+const Dictionary = ({navigation}) => {
   const inputRef = useRef(null);
   const [keyword, setKeyword] = useState('');
   const [definitions, setDefinitions] = useState([]);
+  const [resultSearch, setResultSearch] = useState({});
 
   const onChangeKeyword = text => {
     setKeyword(text);
@@ -53,9 +46,10 @@ const Rate = ({navigation}) => {
         .then(res => {
           console.log('res', res);
           setDefinitions(res.definitions);
+          setResultSearch(res);
         })
         .catch(e => {
-          console.log('e', e);
+          console.log('e', e.content);
         });
     }, 1000);
 
@@ -82,7 +76,7 @@ const Rate = ({navigation}) => {
     <>
       <SafeAreaView style={styles.container}>
         <Header
-          titleHeader="Rate"
+          titleHeader="Dictionary"
           btnLeft
           btnRight
           componentBtnLeft={componentBtnLeftHeader}
@@ -112,8 +106,21 @@ const Rate = ({navigation}) => {
           contentInsetAdjustmentBehavior="automatic"
           style={styles.content}>
           {map([...definitions], (item, index) => {
-            return <Text>{`definitions: ${item.definition}`}</Text>;
+            return (
+              <CardItem
+                item={item}
+                pronunciation={resultSearch?.pronunciation}
+              />
+            );
           })}
+          {/* <Image
+            source={{
+              uri:
+                'https://media.owlbot.info/dictionary/images/ffffffffffffffffy.jpg.400x400_q85_box-174,12,1662,1497_crop_detail.jpg',
+            }}
+            style={[styles.avatar, styles.shadow]}
+            PlaceholderContent={<ActivityIndicator />}
+          /> */}
         </ScrollView>
       </SafeAreaView>
     </>
@@ -151,6 +158,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 15,
     marginTop: 10,
+    flex: 1,
   },
   height40: {
     height: 40,
@@ -173,6 +181,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  shadow: {
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  avatar: {
+    width: 200,
+    height: 200,
+  },
 });
 
-export default Rate;
+export default Dictionary;

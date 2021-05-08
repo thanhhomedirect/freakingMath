@@ -4,7 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import Home from './screens/home';
-import Rate from './screens/rate';
+import Rate from './screens/dictionary';
 import Play from './screens/play';
 
 const Stack = createStackNavigator();

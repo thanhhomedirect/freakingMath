@@ -1,11 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
 import React from 'react';
 import {
   SafeAreaView,
@@ -16,9 +8,8 @@ import {
   StatusBar,
   TouchableNativeFeedback,
 } from 'react-native';
+import {Colors} from 'assets';
 import {Icon} from 'react-native-elements';
-
-import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
 
 const Home = ({navigation}) => {
   return (
@@ -45,7 +36,11 @@ const Home = ({navigation}) => {
             <TouchableNativeFeedback
               onPress={() => navigation.navigate('Play')}>
               <View style={styles.playButton}>
-                <Icon name="play-arrow" type="material" color="#517fa4" />
+                <Icon
+                  name="play-arrow"
+                  type="material"
+                  color={Colors.uglyBlue}
+                />
               </View>
             </TouchableNativeFeedback>
           </View>
@@ -54,12 +49,16 @@ const Home = ({navigation}) => {
               <TouchableNativeFeedback
                 onPress={() => navigation.navigate('Rate')}>
                 <View style={styles.rateButton}>
-                  <Icon name="star-half" type="material" color="#e67315" />
+                  <Icon
+                    name="google-translate"
+                    type="material-community"
+                    color={Colors.niceBlue}
+                  />
                 </View>
               </TouchableNativeFeedback>
               <TouchableNativeFeedback>
                 <View style={styles.rankButton}>
-                  <Icon name="team" type="antdesign" color="#e67315" />
+                  <Icon name="team" type="antdesign" color={Colors.tangerine} />
                 </View>
               </TouchableNativeFeedback>
             </View>
@@ -110,36 +109,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   questionInner: {
-    backgroundColor: Colors.lighter,
+    backgroundColor: Colors.white,
     padding: 10,
     borderWidth: 2,
-    borderColor: Colors.lighter,
+    borderColor: Colors.white,
     borderRadius: 5,
   },
   playButton: {
     marginTop: 46,
-    backgroundColor: Colors.lighter,
+    backgroundColor: Colors.white,
     padding: 10,
     width: 100,
     borderWidth: 2,
-    borderColor: Colors.lighter,
+    borderColor: Colors.white,
     borderRadius: 5,
   },
   rateButton: {
-    backgroundColor: Colors.lighter,
+    backgroundColor: Colors.white,
     padding: 10,
     width: 100,
     borderWidth: 2,
-    borderColor: Colors.lighter,
+    borderColor: Colors.white,
     borderRadius: 5,
     marginRight: 5,
   },
   rankButton: {
-    backgroundColor: Colors.lighter,
+    backgroundColor: Colors.white,
     padding: 10,
     width: 100,
     borderWidth: 2,
-    borderColor: Colors.lighter,
+    borderColor: Colors.white,
     borderRadius: 5,
   },
   optionsButton: {
